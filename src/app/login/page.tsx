@@ -73,45 +73,45 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:24,background:"linear-gradient(135deg,#f7faff,#edf4ff)",fontFamily:"Arial,sans-serif",color:"#172b4d"}}>
-      <section style={{width:"100%",maxWidth:440,background:"#fff",padding:32,borderRadius:24,boxShadow:"0 18px 60px rgba(31,75,130,.12)"}}>
-        <Link href="/" style={{textDecoration:"none",color:"#2563eb",fontWeight:800,letterSpacing:".08em",fontSize:13}}>← VIDA PARALELA</Link>
-        <div style={{marginTop:28,marginBottom:24}}>
-          <div style={{fontSize:12,fontWeight:800,color:"#3975d7",letterSpacing:".12em"}}>SUA JORNADA COMEÇA AQUI</div>
-          <h1 style={{fontSize:30,margin:"10px 0",letterSpacing:"-.04em"}}>{isReset ? "Crie uma nova senha" : mode === "signup" ? "Crie sua conta" : mode === "reset" ? "Recuperar acesso" : "Bem-vindo de volta"}</h1>
-          <p style={{color:"#64748b",lineHeight:1.6,margin:0}}>Acesse seu espaço para organizar ideias, metas e decisões.</p>
+    <main className="auth-screen">
+      <div className="auth-grid" aria-hidden="true" />
+      <div className="auth-glow auth-glow-one" aria-hidden="true" />
+      <div className="auth-glow auth-glow-two" aria-hidden="true" />
+      <section className="auth-layout">
+        <div className="auth-brand-panel">
+          <div className="auth-brand"><span className="auth-brand-icon">◈</span><span>VIDA <b>PARALELA</b></span></div>
+          <div className="auth-orb" aria-hidden="true"><div className="auth-orb-ring ring-a"/><div className="auth-orb-ring ring-b"/><div className="auth-orb-core"><span>VP</span><i>AI</i></div><span className="auth-orb-point point-a"/><span className="auth-orb-point point-b"/></div>
+          <div className="auth-manifesto"><span className="auth-overline">SISTEMA DE POSSIBILIDADES // 2026</span><h1>O futuro não está escrito.<br/><em>Explore o que pode ser.</em></h1><p>Uma nova forma de enxergar decisões, organizar objetivos e construir caminhos com inteligência.</p></div>
+          <div className="auth-status"><span className="auth-status-dot"/> SISTEMA ONLINE <span className="auth-status-line"/> EXPERIÊNCIA PESSOAL</div>
         </div>
-
-        {isReset ? (
-          <form onSubmit={saveNewPassword} style={{display:"grid",gap:14}}>
-            <label style={labelStyle}>Nova senha<input style={inputStyle} type="password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Pelo menos 8 caracteres"/></label>
-            <button style={buttonStyle} disabled={loading}>{loading ? "Salvando..." : "Atualizar senha"}</button>
-          </form>
-        ) : (
-          <>
-            <div style={{display:"flex",gap:8,background:"#f1f5f9",padding:5,borderRadius:12,marginBottom:20}}>
-              <button type="button" onClick={()=>{setMode("login");setError("");setMessage("");}} style={tabStyle(mode==="login")}>Entrar</button>
-              <button type="button" onClick={()=>{setMode("signup");setError("");setMessage("");}} style={tabStyle(mode==="signup")}>Criar conta</button>
-            </div>
-            <form onSubmit={handleSubmit} style={{display:"grid",gap:14}}>
-              {mode === "signup" && <label style={labelStyle}>Como podemos chamar você?<input style={inputStyle} value={name} onChange={e=>setName(e.target.value)} placeholder="Seu nome" required/></label>}
-              <label style={labelStyle}>E-mail<input style={inputStyle} type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@email.com" required/></label>
-              {mode !== "reset" && <label style={labelStyle}>Senha<input style={inputStyle} type="password" minLength={8} autoComplete={mode==="signup"?"new-password":"current-password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Pelo menos 8 caracteres" required/></label>}
-              <button style={buttonStyle} disabled={loading}>{loading ? "Aguarde..." : mode==="signup" ? "Criar minha conta" : "Entrar"}</button>
+        <div className="auth-form-panel">
+          <div className="auth-mobile-brand"><span className="auth-brand-icon">◈</span> VIDA <b>PARALELA</b></div>
+          <div className="auth-form-head"><span className="auth-overline">{isReset ? "RECUPERAÇÃO DE ACESSO" : mode === "signup" ? "INICIAR JORNADA" : mode === "reset" ? "CENTRAL DE ACESSO" : "ACESSO SEGURO"}</span><h2>{isReset ? "Nova senha" : mode === "signup" ? "Crie sua conta." : mode === "reset" ? "Recuperar acesso." : "Entre na sua realidade."}</h2><p>{isReset ? "Defina uma nova senha para continuar." : mode === "signup" ? "Seu espaço pessoal começa com um cadastro simples." : mode === "reset" ? "Informe seu e-mail para receber as instruções." : "Acesse sua jornada e continue de onde parou."}</p></div>
+          {isReset ? (
+            <form onSubmit={saveNewPassword} className="auth-form">
+              <label>Nova senha<input className="auth-input" type="password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mínimo de 8 caracteres"/></label>
+              <button className="auth-submit" disabled={loading}>{loading ? "SALVANDO..." : "ATUALIZAR SENHA  →"}</button>
             </form>
-            <button type="button" onClick={()=>{setMode(mode==="reset"?"login":"reset");setError("");setMessage("");}} style={{border:0,background:"transparent",color:"#2563eb",fontWeight:700,cursor:"pointer",padding:"16px 0 0"}}>{mode==="reset"?"Voltar para entrar":"Esqueci minha senha"}</button>
-            {mode==="reset" && <p style={{fontSize:13,color:"#64748b"}}>Informe seu e-mail e enviaremos um link para redefinir a senha.</p>}
-          </>
-        )}
-        {message && <p role="status" style={{background:"#ecfdf5",color:"#047857",padding:12,borderRadius:10,fontSize:14,lineHeight:1.5}}>{message}</p>}
-        {error && <p role="alert" style={{background:"#fef2f2",color:"#b91c1c",padding:12,borderRadius:10,fontSize:14,lineHeight:1.5}}>{error}</p>}
-        <p style={{fontSize:12,color:"#94a3b8",lineHeight:1.5,marginTop:24}}>Seus dados são privados e protegidos por regras de acesso por usuário. Nunca compartilhe sua senha.</p>
+          ) : (
+            <>
+              <div className="auth-tabs"><button type="button" onClick={()=>{setMode("login");setError("");setMessage("");}} className={mode==="login"?"selected":""}>Entrar</button><button type="button" onClick={()=>{setMode("signup");setError("");setMessage("");}} className={mode==="signup"?"selected":""}>Criar conta</button></div>
+              <form onSubmit={handleSubmit} className="auth-form">
+                {mode === "signup" && <label>Seu nome<input className="auth-input" value={name} onChange={e=>setName(e.target.value)} placeholder="Como podemos chamar você?" required/></label>}
+                <label>E-mail<input className="auth-input" type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@email.com" required/></label>
+                {mode !== "reset" && <label>Senha<input className="auth-input" type="password" minLength={8} autoComplete={mode==="signup"?"new-password":"current-password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mínimo de 8 caracteres" required/></label>}
+                <button className="auth-submit" disabled={loading}>{loading ? "CONECTANDO..." : mode==="signup" ? "CRIAR MINHA CONTA  →" : "ENTRAR NO SISTEMA  →"}</button>
+              </form>
+              <button type="button" onClick={()=>{setMode(mode==="reset"?"login":"reset");setError("");setMessage("");}} className="auth-forgot">{mode==="reset"?"Voltar para entrar":"Esqueci minha senha"}</button>
+            </>
+          )}
+          {message && <p role="status" className="auth-message">{message}</p>}
+          {error && <p role="alert" className="auth-error">{error}</p>}
+          <div className="auth-privacy"><span>◇</span> AMBIENTE PRIVADO · SEUS DADOS PROTEGIDOS</div>
+        </div>
       </section>
     </main>
   );
+
 }
 
-const labelStyle: React.CSSProperties = {display:"grid",gap:7,fontSize:13,fontWeight:700,color:"#334155"};
-const inputStyle: React.CSSProperties = {width:"100%",boxSizing:"border-box",padding:"13px 14px",border:"1px solid #dbe4f0",borderRadius:10,fontSize:15,outlineColor:"#3b82f6"};
-const buttonStyle: React.CSSProperties = {border:0,borderRadius:11,padding:14,background:"#2563eb",color:"#fff",fontSize:15,fontWeight:800,cursor:"pointer",marginTop:4};
-const tabStyle = (active:boolean): React.CSSProperties => ({flex:1,border:0,borderRadius:9,padding:11,background:active?"#fff":"transparent",color:active?"#1d4ed8":"#64748b",fontWeight:800,cursor:"pointer",boxShadow:active?"0 1px 4px rgba(15,23,42,.08)":"none"});
+
