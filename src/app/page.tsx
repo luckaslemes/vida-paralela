@@ -51,7 +51,7 @@ export default function Home() {
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark"><Waves size={20}/></span><strong>VIDA PARALELA</strong></div>
           <div className="breadcrumb">Aplicativo <ChevronRight size={14}/> <strong>Visão geral</strong></div>
-          <button className="icon-button" aria-label="Notificações"><Bell size={19}/><i/></button>
+          <a className="account-link" href="/login">Entrar / Criar conta <ArrowRight size={15}/></a>
         </header>
 
         <div className="content">
