@@ -31,7 +31,7 @@ export default function SimulatorPage() {
               <label style={label}>REALIDADE B — mudar de caminho<textarea required value={optionB} onChange={e=>{setOptionB(e.target.value);setShow(false);}} placeholder="Qual seria a alternativa?" style={field}/></label>
               <label style={label}>REALIDADE C — outra possibilidade<textarea required value={optionC} onChange={e=>{setOptionC(e.target.value);setShow(false);}} placeholder="Existe um terceiro caminho?" style={field}/></label>
             </div>
-            <button type="submit" style={{background:"#2878d7",color:"#fff,border:0,borderRadius:10,padding:"14px 18px",fontWeight:800,cursor:"pointer"}}>Comparar minhas possibilidades</button>
+            <button type="submit" style={{background:"#2878d7",color:"#fff",border:0,borderRadius:10,padding:"14px 18px",fontWeight:800,cursor:"pointer"}}>Comparar minhas possibilidades</button>
           </form>
           {show && <section style={{marginTop:26,borderTop:"1px solid #e8edf4",paddingTop:22}}>
             <h2 style={{fontSize:20}}>Sua comparação</h2>
