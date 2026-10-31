@@ -3,15 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 type Scenario = {
   name: string;
   description: string;
+  pros: string[];
+  cons: string[];
   opportunities: string[];
   risks: string[];
   first_steps: string[];
   short_term: string;
   long_term: string;
+  probability_favorable: string;
+  probability_unfavorable: string;
+  probability_mixed: string;
+  probability_basis: string;
   confidence: string;
 };
 type Result = { title: string; summary: string; scenarios: { A: Scenario; B: Scenario; C: Scenario } };
@@ -54,7 +61,7 @@ export default function SimulatorPage() {
         <div style={{marginTop:34,background:"#fff",border:"1px solid #e8edf4",borderRadius:20,padding:28,boxShadow:"0 12px 35px rgba(30,80,140,.06)"}}>
           <div style={{color:"#2878d7",fontSize:11,fontWeight:800,letterSpacing:".13em",display:"flex",gap:8,alignItems:"center"}}><Sparkles size={15}/> SIMULADOR DE REALIDADES COM IA</div>
           <h1 style={{fontSize:34,letterSpacing:"-.04em",margin:"12px 0"}}>Imagine caminhos antes de decidir.</h1>
-          <p style={{color:"#718096",lineHeight:1.6,maxWidth:760}}>Você descreve somente a decisão. A inteligência artificial cria automaticamente as realidades A, B e C, com oportunidades, riscos e primeiros passos. São simulações hipotéticas, não previsões garantidas.</p>
+          <p style={{color:"#718096",lineHeight:1.6,maxWidth:760}}>Você descreve somente a decisão. A IA transforma sua decisão em três caminhos possíveis e apresenta conselhos, prós e contras, riscos, oportunidades e probabilidades estimadas. São análises condicionais, não previsões garantidas.</p>
           <form onSubmit={generate} style={{display:"grid",gap:16,marginTop:26}}>
             <label style={label}>Qual decisão você está considerando?
               <textarea required minLength={10} maxLength={2000} value={decision} onChange={e=>setDecision(e.target.value)} placeholder="Ex.: Estou pensando em sair do meu emprego para abrir um pequeno negócio..." style={field}/>
@@ -80,14 +87,17 @@ export default function SimulatorPage() {
                   <div style={{fontSize:11,fontWeight:900,color:"#2878d7",letterSpacing:".1em"}}>REALIDADE {key}</div>
                   <h3 style={{fontSize:19,margin:"8px 0"}}>{s.name}</h3>
                   <p style={{fontSize:14,lineHeight:1.6,color:"#475569"}}>{s.description}</p>
+                  <Section title="Pontos positivos" items={s.pros}/>
+                  <Section title="Pontos negativos" items={s.cons}/>
                   <Section title="Oportunidades" items={s.opportunities}/>
                   <Section title="Riscos" items={s.risks}/>
                   <Section title="Primeiros passos" items={s.first_steps}/>
+                  <div style={{background:"#eef5ff",borderRadius:10,padding:12,marginTop:14,fontSize:13,lineHeight:1.6}}><b>Probabilidades estimadas pela IA</b><br/>Resultado favorável: {s.probability_favorable}<br/>Resultado desfavorável: {s.probability_unfavorable}<br/>Resultado misto: {s.probability_mixed}<p style={{margin:"8px 0 0",color:"#52657c"}}>{s.probability_basis}</p></div>
                   <div style={{borderTop:"1px solid #dce8f5",marginTop:14,paddingTop:12,fontSize:13,lineHeight:1.6}}><b>Curto prazo:</b> {s.short_term}<br/><b>Longo prazo:</b> {s.long_term}<br/><b>Confiança da análise:</b> {s.confidence}</div>
                 </article>;
               })}
             </div>
-            <p style={{fontSize:12,color:"#718096",marginTop:18}}>As realidades são hipóteses construídas a partir das informações fornecidas. Resultados reais dependem de fatores pessoais e externos que podem mudar.</p>
+            <p style={{fontSize:12,color:"#718096",marginTop:18}}>As probabilidades são estimativas orientativas da IA, baseadas nas informações e premissas disponíveis. Não são estatísticas comprovadas nem garantias. A IA deve explicar suas incertezas e o que pode alterar cada cenário.</p>
           </section>}
         </div>
       </div>
