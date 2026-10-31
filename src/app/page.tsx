@@ -80,7 +80,7 @@ export default function Home() {
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark"><Waves size={20}/></span><strong>VIDA PARALELA</strong></div>
           <div className="breadcrumb">Aplicativo <ChevronRight size={14}/> <strong>Visão geral</strong></div>
-          {signedIn ? <div style={{display:"flex",alignItems:"center",gap:12,fontSize:12}}><span>Olá, {userName}</span><button className="account-link" onClick={signOut}>Sair</button></div> : <a className="account-link" href="/login">Entrar / Criar conta <ArrowRight size={15}/></a>}
+          {signedIn ? <div style={{display:"flex",alignItems:"center",gap:12,fontSize:12}}><span>Olá, {userName}</span><button className="account-link" onClick={signOut}>Sair</button></div> : <div style={{display:"flex",alignItems:"center",gap:14}}><a className="account-link" href="/premium">Premium <ArrowRight size={15}/></a><a className="account-link" href="/login">Entrar / Criar conta <ArrowRight size={15}/></a></div>}
         </header>
 
         <div className="content">
@@ -106,7 +106,7 @@ export default function Home() {
             </div>
           </section>
 
-          <div className="section-heading"><div><span className="eyebrow">SEU PAINEL</span><h2>Suas ferramentas</h2></div><span className="section-note">Uma vida, muitas possibilidades.</span></div>
+          <div className="section-heading"><div><span className="eyebrow">SEU PAINEL</span><h2>Suas ferramentas</h2></div><a className="section-note" href="/premium">Conheça o Premium →</a></div>
           <div className="module-grid">
             {modules.map((m) => { const Icon = m.icon; return (
               <article className="module-card" key={m.title}>
