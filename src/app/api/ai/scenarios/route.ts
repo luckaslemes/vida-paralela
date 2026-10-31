@@ -1,9 +1,23 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const authorization = request.headers.get("authorization");
+    const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : "";
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!token || !supabaseUrl || !supabaseKey) {
+      return NextResponse.json({ error: "Entre na sua conta para usar o simulador." }, { status: 401 });
+    }
+    const authClient = createClient(supabaseUrl, supabaseKey, { auth: { autoRefreshToken: false, persistSession: false } });
+    const { data: authData, error: authError } = await authClient.auth.getUser(token);
+    if (authError || !authData.user) {
+      return NextResponse.json({ error: "Sua sessão expirou. Entre novamente." }, { status: 401 });
+    }
+
     const apiKey = process.env.AI_PROVIDER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
