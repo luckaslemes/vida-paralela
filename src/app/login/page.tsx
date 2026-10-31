@@ -1,13 +1,14 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
-  const search = useSearchParams();
+  const [isReset, setIsReset] = useState(false);
+  useEffect(() => { setIsReset(new URLSearchParams(window.location.search).get("reset") === "1"); }, []);
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,8 +65,6 @@ export default function LoginPage() {
     if (authError) setError(authError.message);
     else { setMessage("Senha atualizada. Você já pode continuar usando sua conta."); setMode("login"); setPassword(""); }
   }
-
-  const isReset = search.get("reset") === "1";
 
   return (
     <main style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:24,background:"linear-gradient(135deg,#f7faff,#edf4ff)",fontFamily:"Arial,sans-serif",color:"#172b4d"}}>
