@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import {
   Activity, ArrowRight, Bell, BriefcaseBusiness, CalendarDays, Check,
@@ -24,6 +25,8 @@ const tasks = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [userName, setUserName] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
 
@@ -32,11 +35,15 @@ export default function Home() {
     let active = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
-      setSignedIn(Boolean(data.session));
+      if (!data.session) { router.replace("/login"); return; }
+      setSignedIn(true);
+      setCheckingAuth(false);
       setUserName(data.session?.user.user_metadata?.display_name || data.session?.user.email || null);
     });
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSignedIn(Boolean(session));
+      if (!session) { router.replace("/login"); return; }
+      setCheckingAuth(false);
+      setSignedIn(true);
       setUserName(session?.user.user_metadata?.display_name || session?.user.email || null);
     });
     return () => { active = false; authListener.subscription.unsubscribe(); };
@@ -48,6 +55,8 @@ export default function Home() {
     setSignedIn(false);
     setUserName(null);
   }
+
+  if (checkingAuth || !signedIn) return <main style={{minHeight:"100vh",background:"#050b18",display:"grid",placeItems:"center",color:"#70d8f5",fontFamily:"Arial,sans-serif",letterSpacing:".2em",fontSize:11}}>VIDA PARALELA · AUTENTICANDO...</main>;
 
   return (
     <main className="app-shell">
