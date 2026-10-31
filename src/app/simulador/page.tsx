@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -24,6 +25,24 @@ type Scenario = {
 type Result = { title: string; summary: string; scenarios: { A: Scenario; B: Scenario; C: Scenario } };
 
 export default function SimulatorPage() {
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  useEffect(() => {
+    let active = true;
+    if (!supabase) { router.replace("/login"); return; }
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      if (!data.session) { router.replace("/login"); return; }
+      setAuthenticated(true);
+      setCheckingAuth(false);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) router.replace("/login");
+      else { setAuthenticated(true); setCheckingAuth(false); }
+    });
+    return () => { active = false; listener.subscription.unsubscribe(); };
+  }, [router]);
   const [decision, setDecision] = useState("");
   const [context, setContext] = useState("");
   const [result, setResult] = useState<Result | null>(null);
@@ -53,6 +72,8 @@ export default function SimulatorPage() {
       setLoading(false);
     }
   }
+
+  if (checkingAuth || !authenticated) return <main style={{minHeight:"100vh",background:"#050b18",display:"grid",placeItems:"center",color:"#70d8f5",fontSize:11,letterSpacing:".2em"}}>VIDA PARALELA · AUTENTICANDO...</main>;
 
   return (
     <main style={{minHeight:"100vh",background:"#f7f9fc",padding:"32px 18px",color:"#17253a",fontFamily:"Arial,sans-serif"}}>
