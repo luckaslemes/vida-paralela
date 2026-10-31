@@ -28,13 +28,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error: authError } = await supabase.auth.signUp({
+        const { data, error: authError } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { display_name: name }, emailRedirectTo: window.location.origin + "/login" },
+          options: { data: { display_name: name } },
         });
         if (authError) throw authError;
-        setMessage("Cadastro iniciado! Confira seu e-mail para confirmar a conta antes de entrar.");
+        if (data.session) {
+          setMessage("Conta criada com sucesso! Entrando no VIDA PARALELA...");
+          router.push("/");
+          router.refresh();
+        } else {
+          setMessage("Cadastro recebido, mas a confirmação por e-mail ainda está ativa no Supabase. Desative a confirmação de e-mail nas configurações de autenticação para permitir entrar sem receber mensagem.");
+        }
       } else if (mode === "reset") {
         const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + "/login?reset=1",
