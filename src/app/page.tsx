@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import {
   Activity, ArrowRight, Bell, BriefcaseBusiness, CalendarDays, Check,
   ChevronRight, CircleHelp, Compass, CreditCard, Heart, Lightbulb,
@@ -20,6 +24,31 @@ const tasks = [
 ];
 
 export default function Home() {
+  const [userName, setUserName] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      setSignedIn(Boolean(data.session));
+      setUserName(data.session?.user.user_metadata?.display_name || data.session?.user.email || null);
+    });
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session));
+      setUserName(session?.user.user_metadata?.display_name || session?.user.email || null);
+    });
+    return () => { active = false; authListener.subscription.unsubscribe(); };
+  }, []);
+
+  async function signOut() {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setSignedIn(false);
+    setUserName(null);
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -30,7 +59,7 @@ export default function Home() {
         <div className="side-label">MENU PRINCIPAL</div>
         <nav className="nav-list">
           <a className="nav-item active" href="#inicio"><Activity size={18}/> Visão geral</a>
-          <a className="nav-item" href="#realidades"><Compass size={18}/> Realidades</a>
+          <a className="nav-item" href="/simulador"><Compass size={18}/> Realidades</a>
           <a className="nav-item" href="#financeiro"><Wallet size={18}/> Financeiro</a>
           <a className="nav-item" href="#agenda"><CalendarDays size={18}/> Agenda</a>
           <a className="nav-item" href="#inspiracao"><Heart size={18}/> Inspiração</a>
@@ -43,7 +72,7 @@ export default function Home() {
             <p>Seu espaço para planejar com mais clareza.</p>
             <a href="mailto:suporte@vidaparalela.app">Fale conosco <ArrowRight size={14}/></a>
           </div>
-          <div className="profile-mini"><div className="avatar">VP</div><div><strong>Minha conta</strong><small>Plano gratuito</small></div><ChevronRight size={16}/></div>
+          <div className="profile-mini"><div className="avatar">{signedIn ? (userName?.[0]?.toUpperCase() || "U") : "VP"}</div><div><strong>{signedIn ? userName : "Minha conta"}</strong><small>{signedIn ? "Conta conectada" : "Plano gratuito"}</small></div><ChevronRight size={16}/></div>
         </div>
       </aside>
 
@@ -51,7 +80,7 @@ export default function Home() {
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark"><Waves size={20}/></span><strong>VIDA PARALELA</strong></div>
           <div className="breadcrumb">Aplicativo <ChevronRight size={14}/> <strong>Visão geral</strong></div>
-          <a className="account-link" href="/login">Entrar / Criar conta <ArrowRight size={15}/></a>
+          {signedIn ? <div style={{display:"flex",alignItems:"center",gap:12,fontSize:12}}><span>Olá, {userName}</span><button className="account-link" onClick={signOut}>Sair</button></div> : <a className="account-link" href="/login">Entrar / Criar conta <ArrowRight size={15}/></a>}
         </header>
 
         <div className="content">
@@ -69,7 +98,7 @@ export default function Home() {
               <span className="feature-kicker"><Sparkles size={14}/> SIMULADOR DE REALIDADES PESSOAIS</span>
               <h2>E se você escolhesse<br/>um caminho diferente?</h2>
               <p>Descreva uma decisão. Explore possibilidades, consequências, riscos e oportunidades antes de agir.</p>
-              <a className="primary-button" href="mailto:suporte@vidaparalela.app?subject=Quero%20testar%20o%20simulador">Conhecer o simulador <ArrowRight size={16}/></a>
+              <a className="primary-button" href="/simulador">Conhecer o simulador <ArrowRight size={16}/></a>
             </div>
             <div className="path-visual" aria-hidden="true">
               <div className="path-label label-a">REALIDADE A</div><div className="path-label label-b">REALIDADE B</div><div className="path-label label-c">REALIDADE C</div>
@@ -84,7 +113,7 @@ export default function Home() {
                 <div className={`module-icon ${m.color}`}><Icon size={21}/></div>
                 <span className="module-tag">{m.tag}</span>
                 <h3>{m.title}</h3><p>{m.desc}</p>
-                <a href={m.title.includes("financeira") ? "#financeiro" : m.title.includes("Agenda") ? "#agenda" : m.title.includes("Inspiração") ? "#inspiracao" : m.title.includes("Carreira") ? "#carreira" : "#realidades"}>Acessar <ArrowRight size={14}/></a>
+                <a href={m.title.includes("financeira") ? "#financeiro" : m.title.includes("Agenda") ? "#agenda" : m.title.includes("Inspiração") ? "#inspiracao" : m.title.includes("Carreira") ? "#carreira" : "/simulador"}>Acessar <ArrowRight size={14}/></a>
               </article>
             ); })}
           </div>
