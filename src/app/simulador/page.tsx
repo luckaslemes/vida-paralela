@@ -29,9 +29,12 @@ export default function SimulatorPage() {
     setError("");
     setResult(null);
     try {
+      const { data: sessionData } = await supabase?.auth.getSession() ?? { data: { session: null } };
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error("Entre na sua conta para gerar suas realidades.");
       const response = await fetch("/api/ai/scenarios", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ decision, context }),
       });
       const data = await response.json();
