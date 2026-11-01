@@ -18,10 +18,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Sua sessão expirou. Entre novamente." }, { status: 401 });
     }
 
-    const apiKey = process.env.AI_PROVIDER_API_KEY;
-    if (!apiKey) {
+    const ollamaBaseUrl = (process.env.OLLAMA_BASE_URL || "").replace(/\/$/, "");
+    const ollamaProxyToken = process.env.OLLAMA_PROXY_TOKEN;
+    if (!ollamaBaseUrl || !ollamaProxyToken) {
       return NextResponse.json(
-        { error: "A inteligência artificial ainda não foi configurada. Adicione a chave do provedor no servidor." },
+        { error: "A inteligência artificial local ainda não está conectada. Verifique a configuração do servidor." },
         { status: 503 }
       );
     }
@@ -37,18 +38,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "O contexto deve ter no máximo 2.000 caracteres." }, { status: 400 });
     }
 
-    const baseUrl = (process.env.AI_PROVIDER_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-    const model = process.env.AI_MODEL || "gpt-4o-mini";
-    const response = await fetch(baseUrl + "/chat/completions", {
+    const model = process.env.OLLAMA_MODEL || "qwen2.5:3b";
+    const response = await fetch(ollamaBaseUrl + "/api/chat", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${ollamaProxyToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model,
-        temperature: 0.7,
-        response_format: { type: "json_object" },
+        stream: false,
+        format: "json",
+        options: { temperature: 0.7 },
         messages: [
           {
             role: "system",
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Não foi possível gerar as realidades agora. Tente novamente em instantes." }, { status: 502 });
     }
 
-    const content = data?.choices?.[0]?.message?.content;
+    const content = data?.message?.content;
     if (typeof content !== "string") {
       return NextResponse.json({ error: "A IA retornou uma resposta em formato inesperado." }, { status: 502 });
     }
